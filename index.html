@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuotaDrop — Malaysia Fuel Quota Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@600;700&family=Unbounded:wght@700;900&family=Cabinet+Grotesk:wght@400;500;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Familjen+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   THEME TOKENS
+═══════════════════════════════════════════ */
+:root {
+  --green:    #00A878;
+  --green-lt: #E6F7F3;
+  --amber:    #F59E0B;
+  --amber-lt: #FEF3C7;
+  --red:      #EF4444;
+  --red-lt:   #FEE2E2;
+  --blue:     #3B82F6;
+  --blue-lt:  #DBEAFE;
+  --market:   #F97316;
+
+  /* LIGHT defaults */
+  --bg:       #F5F7FA;
+  --surface:  #FFFFFF;
+  --card:     #FFFFFF;
+  --border:   #E2E8F0;
+  --border2:  #CBD5E1;
+  --text:     #0F172A;
+  --text2:    #475569;
+  --muted:    #94A3B8;
+  --ticker-bg:#0F172A;
+  --ticker-tx:#94A3B8;
+  --shadow:   0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 24px rgba(0,0,0,0.10);
+}
+[data-theme="dark"] {
+  --bg:       #0A0E1A;
+  --surface:  #111827;
+  --card:     #1A2235;
+  --border:   rgba(255,255,255,0.08);
+  --border2:  rgba(255,255,255,0.15);
+  --text:     #F0F4FF;
+  --text2:    #94A3B8;
+  --muted:    #4B5563;
+  --ticker-bg:#080C16;
+  --ticker-tx:#6B7280;
+  --shadow:   0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow-md:0 4px 24px rgba(0,0,0,0.5);
+  --green-lt: rgba(0,168,120,0.12);
+  --amber-lt: rgba(245,158,11,0.12);
+  --red-lt:   rgba(239,68,68,0.12);
+  --blue-lt:  rgba(59,130,246,0.12);
+}
+
+/* ═══════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: 'DM Sans', sans-serif; cursor: pointer; }
+select, input, textarea { font-family: 'DM Sans', sans-serif; }
+a { color: inherit; text-decoration: none; }
+
+/* ═══════════════════════════════════════════
+   FUEL TICKER — DUAL REGION
+═══════════════════════════════════════════ */
+.ticker-wrap {
+  background: var(--ticker-bg);
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.ticker-region-row {
+  display: flex;
+  align-items: stretch;
+  height: 36px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.ticker-region-row:last-child { border-bottom: none; }
+.region-badge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  min-width: 80px;
+}
+.region-badge.west { color: #00A878; background: rgba(0,168,120,0.08); }
+.region-badge.east { color: #F59E0B; background: rgba(245,158,11,0.08); }
+
+.ticker-scroll-area { overflow: hidden; flex: 1; position: relative; }
+.ticker-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  white-space: nowrap;
+  animation: scroll 28s linear infinite;
+  height: 36px;
+}
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 20px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  height: 100%;
+}
+.ti-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--ticker-tx);
+}
+.ti-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ti-price.sub   { color: #00A878; }
+.ti-price.mkt   { color: #F97316; }
+.ti-price.amber { color: #F59E0B; }
+.ti-price.slate { color: #94A3B8; }
+.ti-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.ti-badge.sub { background: rgba(0,168,120,0.2); color: #00A878; }
+.ti-badge.mkt { background: rgba(249,115,22,0.15); color: #F97316; }
+
+@keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  gap: 12px;
+  box-shadow: var(--shadow);
+}
+.logo {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--green);
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+.logo em { color: var(--amber); font-style: normal; }
+
+.nav-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+}
+.ntab {
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  background: transparent;
+  border: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.ntab.active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.theme-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.theme-btn:hover { border-color: var(--border2); }
+
+.btn-post {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--green);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  border: none;
+  border-radius: 9px;
+  padding: 9px 16px;
+  white-space: nowrap;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,168,120,0.3);
+}
+.btn-post:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,168,120,0.4); }
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 24px 28px;
+}
+.hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+}
+.hero-title {
+  font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif;
+  font-size: clamp(26px, 4vw, 48px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+}
+.hero-title .g { color: var(--green); }
+.hero-sub {
+  margin-top: 10px;
+  font-size: 15px;
+  color: var(--text2);
+  max-width: 520px;
+  line-height: 1.65;
+}
+.price-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+.ppill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.ppill-icon { font-size: 16px; }
+.ppill-body {}
+.ppill-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.ppill-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 1px;
+}
+.ppill-price.sub   { color: var(--green); }
+.ppill-price.mkt   { color: var(--market); }
+.ppill-price.amber { color: var(--amber); }
+.ppill-price.slate { color: var(--text2); }
+.ppill-note { font-size: 10px; color: var(--muted); }
+
+/* Quota card */
+.quota-card {
+  background: var(--green-lt);
+  border: 1px solid rgba(0,168,120,0.2);
+  border-radius: 16px;
+  padding: 20px 22px;
+  min-width: 220px;
+  flex-shrink: 0;
+}
+.qc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--green); margin-bottom: 12px; }
+.qc-main {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+.qc-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.qc-bar-wrap { margin-top: 12px; }
+.qc-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.qc-bar-fill { height: 100%; width: 40%; background: var(--green); border-radius: 3px; }
+.qc-bar-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--muted); margin-top: 5px;
+}
+.qc-earn {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,168,120,0.2);
+  font-size: 12px;
+  color: var(--text2);
+}
+.qc-earn strong { color: var(--amber); font-family: 'JetBrains Mono'; }
+
+/* ═══════════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════════ */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 24px 60px;
+}
+
+/* ═══════════════════════════════════════════
+   PANELS
+═══════════════════════════════════════════ */
+.panel { display: none; animation: fadeUp 0.3s ease; }
+.panel.active { display: block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+/* ═══════════════════════════════════════════
+   BROWSE PANEL
+═══════════════════════════════════════════ */
+.browse-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.toolbar-left { display: flex; align-items: center; gap: 10px; }
+.toolbar-left h2 { font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; }
+.live-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--muted);
+}
+.live-badge::before {
+  content:''; width:6px; height:6px; border-radius:50%;
+  background: var(--green);
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.filter-row {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.fchip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  transition: all 0.18s;
+}
+.fchip:hover { border-color: var(--green); color: var(--green); }
+.fchip.active { background: var(--green-lt); border-color: var(--green); color: var(--green); font-weight: 600; }
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.scard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.scard-num {
+  font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: -0.5px;
+}
+.scard-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ─── Listing Cards ─── */
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+.lcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: all 0.22s;
+  position: relative;
+}
+.lcard:hover {
+  border-color: var(--green);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.lcard-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 14px;
+}
+.lcard-who { display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 38px; height: 38px; border-radius: 10px;
+  font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif;
+  font-weight: 800; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+.lcard-name { font-size: 14px; font-weight: 600; }
+.lcard-loc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+.fuel-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.fp-r95  { background: var(--green-lt); color: var(--green); }
+.fp-r97  { background: var(--amber-lt); color: var(--amber); }
+.fp-dsl  { background: var(--blue-lt); color: var(--blue); }
+
+.lcard-body {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.lb-item {}
+.lb-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+.lb-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 2px;
+}
+.lb-val.green { color: var(--green); }
+.lb-val.amber { color: var(--amber); }
+.lb-sub { font-size: 10px; color: var(--muted); }
+
+.lcard-note {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.55;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.lcard-contact {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 12px;
+}
+.lcard-contact .email-val {
+  font-family: 'JetBrains Mono'; font-size: 12px; color: var(--green);
+}
+
+.lcard-actions { display: flex; gap: 8px; }
+.btn-contact {
+  flex: 1;
+  background: var(--green);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  border: none;
+  border-radius: 9px;
+  padding: 11px;
+  transition: all 0.2s;
+}
+.btn-contact:hover { box-shadow: 0 3px 12px rgba(0,168,120,0.4); }
+.btn-copy {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 13px;
+  border-radius: 9px;
+  padding: 11px 14px;
+  transition: all 0.2s;
+}
+.btn-copy:hover { border-color: var(--border2); }
+
+.tag-pill {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.tp-verified { background: var(--green-lt); color: var(--green); }
+.tp-flexible { background: var(--amber-lt); color: var(--amber); }
+.tp-urgent   { background: var(--red-lt);   color: var(--red);   }
+
+/* ═══════════════════════════════════════════
+   OFFER PANEL
+═══════════════════════════════════════════ */
+.offer-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  align-items: start;
+}
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+.fc-title { font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.fc-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; line-height: 1.6; }
+
+.form-group { margin-bottom: 18px; }
+.flabel {
+  display: block;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text2); margin-bottom: 7px;
+}
+.finput {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.finput:focus { border-color: var(--green); }
+[data-theme="dark"] .finput { background: var(--bg); }
+
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.fuel-type-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.ftype-opt {
+  padding: 12px 8px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.ftype-opt .ft-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.ftype-opt.active.r95 { background: var(--green-lt); border-color: var(--green); color: var(--green); }
+.ftype-opt.active.r97 { background: var(--amber-lt); border-color: var(--amber); color: var(--amber); }
+.ftype-opt.active.dsl { background: var(--blue-lt); border-color: var(--blue); color: var(--blue); }
+
+.slider-row { display: flex; align-items: center; gap: 12px; }
+.range-slider {
+  flex: 1; -webkit-appearance: none; height: 5px;
+  border-radius: 3px; outline: none; cursor: pointer;
+  background: var(--border);
+}
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px;
+  border-radius: 50%; background: var(--green);
+  box-shadow: 0 0 0 3px rgba(0,168,120,0.2); cursor: pointer;
+}
+.slider-val {
+  font-family: 'JetBrains Mono'; font-size: 16px;
+  font-weight: 600; color: var(--green);
+  min-width: 56px; text-align: right;
+}
+
+.submit-btn {
+  width: 100%;
+  background: var(--green);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  border-radius: 11px;
+  padding: 15px;
+  margin-top: 4px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 12px rgba(0,168,120,0.3);
+}
+.submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,168,120,0.4); }
+
+/* Preview card */
+.preview-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 100px;
+}
+.preview-card h3 { font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.preview-card .pc-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+
+.preview-listing {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.pl-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.pl-row:last-child { border-bottom: none; }
+.pl-key { color: var(--text2); }
+.pl-val { font-weight: 600; font-family: 'JetBrains Mono'; font-size: 13px; }
+.pl-val.green { color: var(--green); }
+.pl-val.amber { color: var(--amber); }
+
+.p2p-note {
+  background: var(--green-lt);
+  border: 1px solid rgba(0,168,120,0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.p2p-note strong { color: var(--green); }
+
+/* ═══════════════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════════════ */
+.how-header { text-align: center; margin-bottom: 32px; }
+.how-header h2 { font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; }
+.how-header p { color: var(--text2); margin-top: 8px; font-size: 15px; }
+
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.how-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 18px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.how-num {
+  font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif;
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--green-lt);
+  [data-theme="light"] & { color: #D1FAF0; }
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.how-icon { font-size: 26px; margin-bottom: 10px; }
+.how-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.how-desc { font-size: 12px; color: var(--text2); line-height: 1.65; }
+
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.trust-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  box-shadow: var(--shadow);
+}
+.trust-icon { font-size: 22px; flex-shrink: 0; }
+.trust-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.trust-desc { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+.numbers-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+.numbers-card h3 { font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+.num-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.num-row:last-child { margin-bottom: 0; }
+.num-row.green-row { background: var(--green-lt); }
+.num-row.amber-row { background: var(--amber-lt); }
+.num-row.neutral { background: var(--bg); }
+.num-row .nr-key { color: var(--text2); }
+.num-row .nr-val { font-weight: 700; font-family: 'JetBrains Mono'; font-size: 14px; }
+.nr-val.green { color: var(--green); }
+.nr-val.amber { color: var(--amber); }
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  transform: scale(0.96) translateY(8px);
+  transition: transform 0.25s;
+  position: relative;
+}
+.modal-overlay.open .modal { transform: scale(1) translateY(0); }
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--bg); border: 1px solid var(--border);
+  width: 30px; height: 30px; border-radius: 50%;
+  font-size: 16px; color: var(--text2);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-title { font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text);
+  color: var(--surface);
+  font-size: 13px; font-weight: 600;
+  padding: 12px 18px;
+  border-radius: 12px;
+  transform: translateY(60px); opacity: 0;
+  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 300;
+  box-shadow: var(--shadow-md);
+  max-width: 300px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   WHATSAPP BUTTONS
+═══════════════════════════════════════════ */
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #25D366;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  border: none;
+  border-radius: 9px;
+  padding: 11px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-whatsapp:hover {
+  background: #20b857;
+  box-shadow: 0 3px 12px rgba(37,211,102,0.4);
+  transform: translateY(-1px);
+}
+.btn-whatsapp svg { width: 15px; height: 15px; flex-shrink: 0; }
+.btn-whatsapp-lg {
+  width: 100%;
+  justify-content: center;
+  font-size: 14px;
+  padding: 14px;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  background: #25D366;
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  text-decoration: none;
+  box-shadow: 0 2px 12px rgba(37,211,102,0.3);
+}
+.btn-whatsapp-lg:hover {
+  background: #20b857;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37,211,102,0.4);
+}
+.btn-whatsapp-lg svg { width: 18px; height: 18px; }
+.lcard-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.lcard-contact {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.lcard-contact .wa-val {
+  font-family: 'JetBrains Mono'; font-size: 12px; color: #25D366;
+}
+/* ═══════════════════════════════════════════
+   MOBILE
+═══════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .how-grid { grid-template-columns: 1fr 1fr; }
+  .offer-grid { grid-template-columns: 1fr; }
+  .preview-card { position: static; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  nav { padding: 0 14px; height: 54px; gap: 8px; }
+  .nav-tabs { display: none; }
+  .logo { font-size: 15px; letter-spacing: -0.3px; }
+  .btn-post span { display: none; }
+  .btn-post { padding: 8px 12px; font-size: 12px; border-radius: 8px; }
+  .theme-btn { width: 32px; height: 32px; font-size: 14px; }
+
+  /* Mobile bottom nav */
+  .mobile-nav {
+    display: flex;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    padding: 0 0 env(safe-area-inset-bottom);
+  }
+  .mnav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 10px 0 8px;
+    font-size: 10px; font-weight: 600;
+    color: var(--muted);
+    border: none; background: transparent;
+    gap: 3px;
+    transition: color 0.18s;
+  }
+  .mnav-item .mi { font-size: 20px; }
+  .mnav-item.active { color: var(--green); }
+
+  body { padding-bottom: 72px; }
+
+  .hero-inner { grid-template-columns: 1fr; gap: 20px; }
+  .quota-card { display: none; }
+  .hero { padding: 18px 14px; }
+  .main { padding: 16px 14px 40px; }
+  .hero-title { font-size: 24px; letter-spacing: -1px; }
+  .price-pills { gap: 6px; }
+  .ppill { padding: 8px 10px; }
+  .ppill-price { font-size: 13px; }
+  .ppill-label { font-size: 9px; }
+  .ppill-icon { font-size: 14px; }
+
+  .how-grid { grid-template-columns: 1fr; }
+  .trust-grid { grid-template-columns: 1fr; }
+  .listings-grid { grid-template-columns: 1fr; }
+  .frow { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .scard { padding: 12px 10px; }
+  .scard-num { font-size: 18px; }
+  .scard-label { font-size: 10px; }
+  .ftype-opt { padding: 10px 4px; font-size: 12px; }
+  .ticker-region-row { height: 30px; }
+  .region-badge { min-width: 46px; padding: 0 6px; font-size: 7px; letter-spacing: 0.8px; }
+  .ti-label { font-size: 9px; }
+  .ti-price { font-size: 11px; }
+  .ticker-item { padding: 0 14px; }
+
+  .browse-toolbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .filter-row { gap: 5px; }
+  .fchip { padding: 5px 10px; font-size: 11px; }
+  .form-card, .preview-card { padding: 18px 16px; border-radius: 14px; }
+  .fc-title { font-size: 18px; }
+  
+  /* WhatsApp button mobile */
+  .btn-whatsapp { padding: 10px 12px; font-size: 12px; }
+  .lcard-actions { flex-wrap: nowrap; }
+  .btn-contact { font-size: 12px; padding: 10px 8px; }
+
+  /* Numbers card mobile */
+  .num-row { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 12px; }
+  .nr-val { font-size: 13px; }
+  .nr-key { font-size: 12px; }
+
+  /* Modal mobile */
+  .modal { padding: 20px 16px; border-radius: 16px; }
+  .modal-title { font-size: 17px; }
+
+  /* Toast mobile */
+  .toast { bottom: 80px; right: 12px; left: 12px; max-width: none; text-align: center; }
+}
+@media (max-width: 380px) {
+  .logo { font-size: 13px; }
+  .price-pills { gap: 4px; }
+  .ppill { padding: 6px 8px; gap: 5px; }
+  .ppill-price { font-size: 12px; }
+}
+@media (min-width: 641px) {
+  .mobile-nav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── TICKER ─── -->
+<div class="ticker-wrap">
+  <!-- West Malaysia row -->
+  <div class="ticker-region-row">
+    <div class="region-badge west">W.MY</div>
+    <div class="ticker-scroll-area">
+      <div class="ticker-track" id="tick-w">
+        <!-- items injected by JS, duplicated for loop -->
+      </div>
+    </div>
+  </div>
+  <!-- East Malaysia row -->
+  <div class="ticker-region-row">
+    <div class="region-badge east">E.MY</div>
+    <div class="ticker-scroll-area">
+      <div class="ticker-track" id="tick-e"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="logo">Quota<em>Drop</em></div>
+  <div class="nav-tabs">
+    <button class="ntab active" onclick="gotoPanel('browse',this)">🔍 Browse</button>
+    <button class="ntab" onclick="gotoPanel('offer',this)">✏️ List Quota</button>
+    <button class="ntab" onclick="gotoPanel('how',this)">💡 How It Works</button>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" onclick="toggleTheme()" id="theme-icon" title="Toggle theme">🌙</button>
+    <button class="btn-post" onclick="gotoPanel('offer',null)">
+      <span>+ List Quota</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-title">Your unused quota.<br><span class="g">Someone else's savings.</span></div>
+      <p class="hero-sub">Malaysians with leftover BUDI95, RON97 or diesel quota can list it here. Takers contact you directly — zero middleman, zero platform fee. Pure P2P.</p>
+      <div class="price-pills">
+        <div class="ppill">
+          <div class="ppill-icon">⛽</div>
+          <div class="ppill-body">
+            <div class="ppill-label">RON95 BUDI95</div>
+            <div class="ppill-price sub">RM1.99/L</div>
+            <div class="ppill-note">Your subsidised rate</div>
+          </div>
+        </div>
+        <div class="ppill">
+          <div class="ppill-icon">📈</div>
+          <div class="ppill-body">
+            <div class="ppill-label">RON95 Market</div>
+            <div class="ppill-price mkt">RM4.02/L</div>
+            <div class="ppill-note">Unsubsidised W.MY</div>
+          </div>
+        </div>
+        <div class="ppill">
+          <div class="ppill-icon">🔶</div>
+          <div class="ppill-body">
+            <div class="ppill-label">RON97</div>
+            <div class="ppill-price amber">RM5.10/L</div>
+            <div class="ppill-note">W.MY this week</div>
+          </div>
+        </div>
+        <div class="ppill">
+          <div class="ppill-icon">🚛</div>
+          <div class="ppill-body">
+            <div class="ppill-label">Diesel W.MY</div>
+            <div class="ppill-price slate">RM5.97/L</div>
+            <div class="ppill-note">Peninsular market</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="quota-card">
+      <div class="qc-label">Your April Quota</div>
+      <div class="qc-main">120L</div>
+      <div class="qc-sub">remaining of 200L this month</div>
+      <div class="qc-bar-wrap">
+        <div class="qc-bar"><div class="qc-bar-fill"></div></div>
+        <div class="qc-bar-label"><span>80L used</span><span>120L left</span></div>
+      </div>
+      <div class="qc-earn">
+        List all 120L at RM2.80 → earn approx <strong>RM97</strong> extra this month
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MAIN ─── -->
+<div class="main">
+
+  <!-- ══ BROWSE PANEL ══ -->
+  <div id="panel-browse" class="panel active">
+    <div class="stats-row">
+      <div class="scard"><div class="scard-num">247</div><div class="scard-label">Active Listings</div></div>
+      <div class="scard"><div class="scard-num">12,840L</div><div class="scard-label">Quota Available</div></div>
+      <div class="scard"><div class="scard-num">RM2.03</div><div class="scard-label">Avg Saving/Litre</div></div>
+      <div class="scard"><div class="scard-num">100%</div><div class="scard-label">No Platform Fee</div></div>
+    </div>
+
+    <div class="browse-toolbar">
+      <div class="toolbar-left">
+        <h2>Live Listings</h2>
+        <div class="live-badge">Updated now</div>
+      </div>
+      <div class="filter-row" id="filter-row">
+        <button class="fchip active" onclick="filterListings('all',this)">All Fuel</button>
+        <button class="fchip" onclick="filterListings('r95',this)">⛽ RON95</button>
+        <button class="fchip" onclick="filterListings('r97',this)">🔶 RON97</button>
+        <button class="fchip" onclick="filterListings('dsl',this)">🚛 Diesel</button>
+        <button class="fchip" onclick="filterListings('50+',this)">50L+</button>
+      </div>
+    </div>
+    <div class="listings-grid" id="listings-grid"></div>
+  </div>
+
+  <!-- ══ OFFER PANEL ══ -->
+  <div id="panel-offer" class="panel">
+    <div class="offer-grid">
+      <div class="form-card">
+        <div class="fc-title">List Your Surplus Quota</div>
+        <div class="fc-sub">No account needed. Add your email so interested takers can reach you directly. Zero fees, zero middleman — you negotiate and meet at the pump.</div>
+
+        <div class="form-group">
+          <label class="flabel">Fuel Type</label>
+          <div class="fuel-type-selector">
+            <button class="ftype-opt active r95" onclick="selectFuel('r95',this)">
+              <span class="ft-icon">⛽</span>RON 95
+            </button>
+            <button class="ftype-opt r97" onclick="selectFuel('r97',this)">
+              <span class="ft-icon">🔶</span>RON 97
+            </button>
+            <button class="ftype-opt dsl" onclick="selectFuel('dsl',this)">
+              <span class="ft-icon">🚛</span>Diesel
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="flabel">Litres to Offer — <span id="litre-disp" style="color:var(--green);font-family:'JetBrains Mono'">60 L</span></label>
+          <div class="slider-row">
+            <input type="range" class="range-slider" min="10" max="200" value="60" id="litreSlider" oninput="updateOffer()">
+            <div class="slider-val" id="s-litres">60 L</div>
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="form-group">
+            <label class="flabel">Your Asking Price (RM/L)</label>
+            <input class="finput" type="number" id="askPrice" value="2.80" step="0.10" min="2.00" max="5.80" oninput="updateOffer()">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Area / Neighbourhood</label>
+            <input class="finput" type="text" id="fArea" placeholder="e.g. Cheras, KL">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="flabel">Your Contact Email (shown on listing)</label>
+          <input class="finput" type="email" id="fEmail" placeholder="yourname@gmail.com">
+        </div>
+
+        <div class="form-group">
+          <label class="flabel">WhatsApp Number <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(recommended for faster replies)</span></label>
+          <input class="finput" type="tel" id="fWhatsapp" placeholder="e.g. 60123456789 (with country code)">
+        </div>
+
+        <div class="form-group">
+          <label class="flabel">Preferred Station (optional)</label>
+          <select class="finput" id="fStation">
+            <option value="">Any station</option>
+            <option>Petronas</option>
+            <option>Shell</option>
+            <option>BHP</option>
+            <option>Petron</option>
+            <option>Caltex</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="flabel">Notes for Taker</label>
+          <textarea class="finput" rows="3" id="fNote" placeholder="e.g. Available mornings only. WhatsApp me to confirm time and location."></textarea>
+        </div>
+
+        <button class="submit-btn" onclick="submitListing()">Post Listing — Free &amp; Instant</button>
+        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">
+          No account required. Listing expires at month end. Takers contact you via WhatsApp or email.
+        </p>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-card">
+        <h3>Listing Preview</h3>
+        <div class="pc-sub">This is how your listing appears to takers</div>
+        <div class="preview-listing">
+          <div class="pl-row"><span class="pl-key">Fuel</span><span class="pl-val" id="prev-fuel">RON 95 (BUDI95)</span></div>
+          <div class="pl-row"><span class="pl-key">Quantity</span><span class="pl-val green" id="prev-qty">60 L</span></div>
+          <div class="pl-row"><span class="pl-key">Your price</span><span class="pl-val green" id="prev-price">RM2.80 / L</span></div>
+          <div class="pl-row"><span class="pl-key">Taker saves vs market</span><span class="pl-val amber" id="prev-save">RM73.20 total</span></div>
+          <div class="pl-row"><span class="pl-key">Platform fee</span><span class="pl-val green">RM0.00 — none</span></div>
+          <div class="pl-row"><span class="pl-key">You keep</span><span class="pl-val green" id="prev-earn">RM168 total</span></div>
+        </div>
+        <div class="p2p-note">
+          <strong>100% P2P.</strong> QuotaDrop earns nothing. You and the taker agree on price, station, and payment method directly. We just connect you.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HOW IT WORKS PANEL ══ -->
+  <div id="panel-how" class="panel">
+    <div class="how-header">
+      <h2>How QuotaDrop Works</h2>
+      <p>Simple, direct, and free. No accounts, no fees, no middleman.</p>
+    </div>
+
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">01</div>
+        <div class="how-icon">📊</div>
+        <div class="how-title">Check Your Quota</div>
+        <div class="how-desc">BUDI95 gives you 200L/month RON95 at RM1.99. E-hailing drivers get 800L. Unused litres expire — don't waste them.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">02</div>
+        <div class="how-icon">✏️</div>
+        <div class="how-title">Post a Listing</div>
+        <div class="how-desc">No account needed. Pick fuel type (RON95, RON97, Diesel), set your price between subsidy and market rate, drop your email.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">03</div>
+        <div class="how-icon">📧</div>
+        <div class="how-title">Taker Contacts You</div>
+        <div class="how-desc">Interested takers email you directly. Negotiate litres, price, station. Agree on a time and meet — completely between you two.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">04</div>
+        <div class="how-icon">⛽</div>
+        <div class="how-title">Fuel Up &amp; Pay</div>
+        <div class="how-desc">Meet at the agreed station. Lister uses MyKad to pump at subsidised rate. Taker pays lister directly — cash, DuitNow, TnG, whatever you agree.</div>
+      </div>
+    </div>
+
+    <div class="trust-grid">
+      <div class="trust-card">
+        <div class="trust-icon">🆓</div>
+        <div>
+          <div class="trust-title">Zero Platform Fee — Forever</div>
+          <div class="trust-desc">QuotaDrop takes nothing. The spread between what you sell at and RM1.99 is 100% yours. We exist to connect, not to extract.</div>
+        </div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">📧</div>
+        <div>
+          <div class="trust-title">No Account Required</div>
+          <div class="trust-desc">Listers just put their email. Takers browse and reach out. As simple as a classifieds ad — but built for fuel quota.</div>
+        </div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">🤝</div>
+        <div>
+          <div class="trust-title">Direct Negotiation</div>
+          <div class="trust-desc">Price, station, timing, payment — all decided between lister and taker. No app lock-in, no escrow delays. Just people helping people.</div>
+        </div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">⏱️</div>
+        <div>
+          <div class="trust-title">Monthly Reset</div>
+          <div class="trust-desc">Listings auto-expire at month end when quotas reset. New month, new surplus. Come back and list again.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="numbers-card">
+      <h3>Real Numbers — April 2026</h3>
+      <div class="num-row green-row">
+        <span class="nr-key">You have 120L surplus · sell at RM2.80/L</span>
+        <span class="nr-val green">You earn RM97 extra</span>
+      </div>
+      <div class="num-row amber-row">
+        <span class="nr-key">Taker pays RM2.80 instead of RM4.02/L (RON95)</span>
+        <span class="nr-val amber">Taker saves RM146</span>
+      </div>
+      <div class="num-row neutral">
+        <span class="nr-key">Monthly quota (BUDI95, April 2026)</span>
+        <span class="nr-val">200L / person</span>
+      </div>
+      <div class="num-row neutral">
+        <span class="nr-key">E-hailing drivers (Grab, Foodpanda etc.)</span>
+        <span class="nr-val">800L / month</span>
+      </div>
+      <div class="num-row neutral">
+        <span class="nr-key">RON97 this week (W.Malaysia)</span>
+        <span class="nr-val">RM5.10 / L</span>
+      </div>
+      <div class="num-row neutral">
+        <span class="nr-key">Diesel (Peninsular)</span>
+        <span class="nr-val">RM5.97 / L</span>
+      </div>
+      <div class="num-row neutral">
+        <span class="nr-key">Diesel (Sabah, Sarawak, Labuan)</span>
+        <span class="nr-val">RM2.15 / L (subsidised)</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- Mobile Bottom Nav -->
+<div class="mobile-nav">
+  <button class="mnav-item active" id="mn-browse" onclick="gotoPanel('browse',null);setMobileTab('mn-browse')">
+    <span class="mi">🔍</span>Browse
+  </button>
+  <button class="mnav-item" id="mn-offer" onclick="gotoPanel('offer',null);setMobileTab('mn-offer')">
+    <span class="mi">✏️</span>List Quota
+  </button>
+  <button class="mnav-item" id="mn-how" onclick="gotoPanel('how',null);setMobileTab('mn-how')">
+    <span class="mi">💡</span>How It Works
+  </button>
+</div>
+
+<!-- Modal (contact) -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title" id="m-title">Contact Lister</div>
+    <div class="modal-sub" id="m-body">Email the lister to agree on litres, station, and payment.</div>
+    <div class="preview-listing" id="m-details" style="margin-bottom:16px;"></div>
+    <a id="m-whatsapp" href="#" target="_blank" rel="noopener" class="btn-whatsapp-lg" style="margin-bottom:10px;">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.531 5.845L.057 23.478a.75.75 0 00.916.948l5.83-1.526A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.504-5.23-1.383l-.374-.217-3.876 1.015 1.034-3.77-.237-.389A9.954 9.954 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Chat on WhatsApp
+    </a>
+    <a id="m-mailto" href="#" style="display:block;">
+      <button class="submit-btn">Open Email App</button>
+    </a>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">
+      WhatsApp is fastest — or email to arrange station, time &amp; payment
+    </p>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════ DATA ═══════════════ */
+const PRICES = {
+  west: { r95sub: 1.99, r95mkt: 4.02, r97: 5.10, diesel: 5.97 },
+  east: { r95sub: 1.99, r95mkt: 4.02, r97: 5.10, diesel: 2.15 }
+};
+
+const LISTINGS = [
+  { id:1, name:"Razif M.", loc:"Cheras, KL", region:"west", avatar:"R", ac:"#0D6B4B", fuel:"r95", litres:80, ask:2.60, tag:"verified", email:"razif.m@gmail.com", wa:"60123456789", note:"Happy to meet at Petronas Cheras Baru. Prefer morning or after 7pm. WhatsApp me first." },
+  { id:2, name:"Siti A.", loc:"Petaling Jaya", region:"west", avatar:"S", ac:"#5B21B6", fuel:"r95", litres:50, ask:2.50, tag:"flexible", email:"sitianis@gmail.com", wa:"60198765432", note:"Mornings only. Shell preferred. Negotiable on price for bulk requests." },
+  { id:3, name:"Kumar N.", loc:"Subang Jaya", region:"west", avatar:"K", ac:"#1D4ED8", fuel:"r95", litres:120, ask:2.80, tag:"verified", email:"nkumar88@outlook.com", wa:"60111234567", note:"Big surplus this month. Can split into 2 sessions if needed." },
+  { id:4, name:"Farah Z.", loc:"Ampang, KL", region:"west", avatar:"F", ac:"#9D174D", fuel:"r97", litres:30, ask:3.80, tag:"urgent", email:"farahz92@yahoo.com", wa:"60169876543", note:"Quota expires this Friday — priced below market to move fast. RON97 specialist." },
+  { id:5, name:"Wei Liang", loc:"Kepong, KL", region:"west", avatar:"W", ac:"#065F46", fuel:"r95", litres:65, ask:2.70, tag:"verified", email:"weiliangkl@gmail.com", wa:"60127654321", note:"Regular lister. 100% meet rate. Petronas or BHP preferred." },
+  { id:6, name:"Amirul H.", loc:"Shah Alam", region:"west", avatar:"A", ac:"#92400E", fuel:"r95", litres:150, ask:2.55, tag:"flexible", email:"amirul.hisham@gmail.com", wa:"60133456789", note:"E-hailing driver with 800L quota. Open to long-term monthly arrangement." },
+  { id:7, name:"Dayang R.", loc:"Kuching, Sarawak", region:"east", avatar:"D", ac:"#0369A1", fuel:"dsl", litres:100, ask:3.50, tag:"verified", email:"dayangr.kuching@gmail.com", wa:"60198812345", note:"Diesel at RM2.15 subsidised here in Sarawak. You save massively vs W.MY rates." },
+  { id:8, name:"Jeffri K.", loc:"Kota Kinabalu, Sabah", region:"east", avatar:"J", ac:"#7C3AED", fuel:"dsl", litres:80, ask:3.20, tag:"flexible", email:"jeffrik.kk@gmail.com", wa:"60168823456", note:"Sabah subsidised diesel. Great deal for anyone needing diesel at below-Peninsular rates." },
+  { id:9, name:"Mei Lin", loc:"Penang", region:"west", avatar:"M", ac:"#BE185D", fuel:"r97", litres:45, ask:4.20, tag:"flexible", email:"meilin.pg@gmail.com", wa:"60124567890", note:"RON97 surplus. Prefer Shell Georgetown. Can arrange evenings." },
+];
+
+/* ═══════════════ TICKER BUILD ═══════════════ */
+function buildTickerItems(region) {
+  const p = PRICES[region];
+  const r = region === 'west' ? 'W.MY' : 'E.MY (Sabah/Sarawak)';
+  const items = [
+    { label:'RON95 BUDI95', price:`RM${p.r95sub.toFixed(2)}/L`, cls:'sub', badge:'SUBSIDISED', badgeCls:'sub' },
+    { label:'RON95 Market', price:`RM${p.r95mkt.toFixed(2)}/L`, cls:'mkt', badge:'UNSUBSIDISED', badgeCls:'mkt' },
+    { label:'RON97', price:`RM${p.r97.toFixed(2)}/L`, cls:'amber', badge:null },
+    { label:`Diesel`, price:`RM${p.diesel.toFixed(2)}/L`, cls: region==='east' ? 'sub':'slate',
+      badge: region==='east' ? 'SUBSIDISED' : null, badgeCls:'sub' },
+    { label:'Quota (Apr 2026)', price:'200L/person', cls:'sub', badge:null },
+    { label:'E-Hailing Quota', price:'800L/month', cls:'amber', badge:null },
+    { label:'Spread to Earn', price:`RM${(p.r95mkt-p.r95sub).toFixed(2)}/L`, cls:'amber', badge:null },
+  ];
+  return items.map(i=>`
+    <div class="ticker-item">
+      <span class="ti-label">${i.label}</span>
+      <span class="ti-price ${i.cls}">${i.price}</span>
+      ${i.badge ? `<span class="ti-badge ${i.badgeCls}">${i.badge}</span>` : ''}
+    </div>`).join('');
+}
+function initTicker(id, region) {
+  const track = document.getElementById(id);
+  const html = buildTickerItems(region);
+  track.innerHTML = html + html; // duplicate for seamless loop
+}
+initTicker('tick-w','west');
+initTicker('tick-e','east');
+
+/* ═══════════════ THEME ═══════════════ */
+let isDark = false;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+}
+
+/* ═══════════════ PANEL NAVIGATION ═══════════════ */
+function gotoPanel(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  // desktop tabs
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else {
+    const map = { browse: 0, offer: 1, how: 2 };
+    const tabs = document.querySelectorAll('.ntab');
+    if (tabs[map[name]]) tabs[map[name]].classList.add('active');
+  }
+}
+function setMobileTab(id) {
+  document.querySelectorAll('.mnav-item').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ═══════════════ LISTINGS ═══════════════ */
+function fuelLabel(f) {
+  return { r95:'RON 95', r97:'RON 97', dsl:'Diesel' }[f];
+}
+function fuelPillClass(f) {
+  return { r95:'fp-r95', r97:'fp-r97', dsl:'fp-dsl' }[f];
+}
+function fuelIcon(f) {
+  return { r95:'⛽', r97:'🔶', dsl:'🚛' }[f];
+}
+function marketRate(item) {
+  if (item.fuel === 'r95') return item.region === 'east' ? PRICES.east.r95mkt : PRICES.west.r95mkt;
+  if (item.fuel === 'r97') return item.region === 'east' ? PRICES.east.r97 : PRICES.west.r97;
+  if (item.fuel === 'dsl') return item.region === 'east' ? PRICES.east.diesel : PRICES.west.diesel;
+  return 4.02;
+}
+function tagCls(t) { return { verified:'tp-verified', flexible:'tp-flexible', urgent:'tp-urgent' }[t]; }
+function tagLbl(t) { return { verified:'✓ Verified', flexible:'~ Flexible', urgent:'⚡ Urgent' }[t]; }
+
+function renderListings(data) {
+  const grid = document.getElementById('listings-grid');
+  if (!data.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--muted);">No listings match this filter yet.</div>`;
+    return;
+  }
+  grid.innerHTML = data.map((l, i) => {
+    const mkt = marketRate(l);
+    const saving = ((mkt - l.ask) * l.litres).toFixed(2);
+    const totalPay = (l.ask * l.litres).toFixed(2);
+    return `
+    <div class="lcard" style="animation:fadeUp 0.35s ease ${i*0.06}s both;">
+      <span class="tag-pill ${tagCls(l.tag)}">${tagLbl(l.tag)}</span>
+      <div class="lcard-header">
+        <div class="lcard-who">
+          <div class="avatar" style="background:${l.ac};">${l.avatar}</div>
+          <div>
+            <div class="lcard-name">${l.name}</div>
+            <div class="lcard-loc">📍 ${l.loc}</div>
+          </div>
+        </div>
+        <span class="fuel-pill ${fuelPillClass(l.fuel)}">${fuelIcon(l.fuel)} ${fuelLabel(l.fuel)}</span>
+      </div>
+      <div class="lcard-body">
+        <div class="lb-item">
+          <div class="lb-label">Available</div>
+          <div class="lb-val green">${l.litres}L</div>
+          <div class="lb-sub">quota litres</div>
+        </div>
+        <div class="lb-item">
+          <div class="lb-label">Asking</div>
+          <div class="lb-val amber">RM${l.ask.toFixed(2)}/L</div>
+          <div class="lb-sub">market RM${mkt.toFixed(2)}/L</div>
+        </div>
+        <div class="lb-item">
+          <div class="lb-label">Total cost</div>
+          <div class="lb-val">RM${totalPay}</div>
+          <div class="lb-sub">for all ${l.litres}L</div>
+        </div>
+        <div class="lb-item">
+          <div class="lb-label">You save</div>
+          <div class="lb-val green">RM${saving}</div>
+          <div class="lb-sub">vs market</div>
+        </div>
+      </div>
+      <div class="lcard-note">${l.note}</div>
+      <div class="lcard-contact">
+        <span>📧</span>
+        <span class="email-val">${l.email}</span>
+        ${l.wa ? `<span style="margin-left:4px;">·</span><span style="color:#25D366;">💬</span><span class="wa-val">${l.wa}</span>` : ''}
+      </div>
+      <div class="lcard-actions">
+        <button class="btn-contact" onclick="openContact(${l.id})">Contact Lister</button>
+        ${l.wa ? `<a class="btn-whatsapp" href="https://wa.me/${l.wa}?text=${encodeURIComponent(`Hi ${l.name}, I found your listing on QuotaDrop — interested in ${l.litres}L of ${fuelLabel(l.fuel)} at RM${l.ask.toFixed(2)}/L. Can we arrange?`)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.531 5.845L.057 23.478a.75.75 0 00.916.948l5.83-1.526A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.504-5.23-1.383l-.374-.217-3.876 1.015 1.034-3.77-.237-.389A9.954 9.954 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>WhatsApp</a>` : ''}
+        <button class="btn-copy" onclick="copyEmail('${l.email}')" title="Copy email">📋</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let currentFilter = 'all';
+function filterListings(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  let filtered = LISTINGS;
+  if (f === 'r95') filtered = LISTINGS.filter(l => l.fuel === 'r95');
+  else if (f === 'r97') filtered = LISTINGS.filter(l => l.fuel === 'r97');
+  else if (f === 'dsl') filtered = LISTINGS.filter(l => l.fuel === 'dsl');
+  else if (f === '50+') filtered = LISTINGS.filter(l => l.litres >= 50);
+  renderListings(filtered);
+}
+renderListings(LISTINGS);
+
+function copyEmail(email) {
+  navigator.clipboard.writeText(email).then(() => toast('Email copied! ' + email));
+}
+
+/* ═══════════════ CONTACT MODAL ═══════════════ */
+function openContact(id) {
+  const l = LISTINGS.find(x => x.id === id);
+  if (!l) return;
+  const mkt = marketRate(l);
+  const saving = ((mkt - l.ask) * l.litres).toFixed(2);
+  document.getElementById('m-title').textContent = `Contact ${l.name}`;
+  document.getElementById('m-body').textContent = `Reach out to arrange the fuel transfer. Agree on quantity, station, time, and payment between yourselves.`;
+  document.getElementById('m-details').innerHTML = `
+    <div class="pl-row"><span class="pl-key">Fuel</span><span class="pl-val">${fuelIcon(l.fuel)} ${fuelLabel(l.fuel)}</span></div>
+    <div class="pl-row"><span class="pl-key">Litres</span><span class="pl-val green">${l.litres} L</span></div>
+    <div class="pl-row"><span class="pl-key">Asking price</span><span class="pl-val">RM${l.ask.toFixed(2)}/L</span></div>
+    <div class="pl-row"><span class="pl-key">Your saving vs market</span><span class="pl-val amber">RM${saving}</span></div>
+    <div class="pl-row"><span class="pl-key">Email</span><span class="pl-val" style="color:var(--green)">${l.email}</span></div>
+    ${l.wa ? `<div class="pl-row"><span class="pl-key">WhatsApp</span><span class="pl-val" style="color:#25D366">${l.wa}</span></div>` : ''}
+  `;
+  const subject = encodeURIComponent(`QuotaDrop — ${l.litres}L ${fuelLabel(l.fuel)} Quota Request`);
+  const body = encodeURIComponent(`Hi ${l.name},\n\nI found your listing on QuotaDrop and I'm interested in ${l.litres}L of ${fuelLabel(l.fuel)} at RM${l.ask.toFixed(2)}/L.\n\nCould we arrange a time and station?\n\nThanks`);
+  const waMsg = encodeURIComponent(`Hi ${l.name}, I found your listing on QuotaDrop — interested in ${l.litres}L of ${fuelLabel(l.fuel)} at RM${l.ask.toFixed(2)}/L. Can we arrange a meet?`);
+  document.getElementById('m-mailto').href = `mailto:${l.email}?subject=${subject}&body=${body}`;
+  
+  const waBtn = document.getElementById('m-whatsapp');
+  if (l.wa) {
+    waBtn.href = `https://wa.me/${l.wa}?text=${waMsg}`;
+    waBtn.style.display = 'flex';
+  } else {
+    waBtn.style.display = 'none';
+  }
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target.id === 'modal') closeModal(); }
+
+/* ═══════════════ OFFER FORM ═══════════════ */
+let selectedFuel = 'r95';
+const fuelNames = { r95:'RON 95 (BUDI95)', r97:'RON 97', dsl:'Diesel' };
+const fuelMkt = { r95: PRICES.west.r95mkt, r97: PRICES.west.r97, dsl: PRICES.west.diesel };
+
+function selectFuel(f, btn) {
+  selectedFuel = f;
+  document.querySelectorAll('.ftype-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Update suggested ask price
+  const suggest = { r95: 2.80, r97: 4.20, dsl: 3.50 }[f];
+  document.getElementById('askPrice').value = suggest;
+  updateOffer();
+}
+function updateOffer() {
+  const litres = +document.getElementById('litreSlider').value;
+  const ask = +document.getElementById('askPrice').value || 2.80;
+  const mkt = fuelMkt[selectedFuel];
+  const subsidy = selectedFuel === 'r95' ? PRICES.west.r95sub : (selectedFuel === 'r97' ? PRICES.west.r97 : PRICES.west.diesel);
+  const takerSave = ((mkt - ask) * litres).toFixed(2);
+  const youEarn = (ask * litres).toFixed(2);
+
+  document.getElementById('s-litres').textContent = litres + ' L';
+  document.getElementById('litre-disp').textContent = litres + ' L';
+
+  document.getElementById('prev-fuel').textContent = fuelNames[selectedFuel];
+  document.getElementById('prev-qty').textContent = litres + ' L';
+  document.getElementById('prev-price').textContent = `RM${ask.toFixed(2)} / L`;
+  document.getElementById('prev-save').textContent = takerSave > 0 ? `RM${takerSave} total` : '–';
+  document.getElementById('prev-earn').textContent = `RM${youEarn} total`;
+}
+updateOffer();
+
+function submitListing() {
+  const email = document.getElementById('fEmail').value.trim();
+  const area = document.getElementById('fArea').value.trim();
+  const wa = document.getElementById('fWhatsapp').value.trim();
+  if (!email && !wa) { toast('Please enter your email or WhatsApp number ✉️'); return; }
+  if (!area) { toast('Please add your area / location 📍'); return; }
+  toast('Listing posted! Takers will see it now 🎉');
+  // Reset
+  setTimeout(() => gotoPanel('browse', null), 1200);
+}
+
+/* ═══════════════ TOAST ═══════════════ */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
