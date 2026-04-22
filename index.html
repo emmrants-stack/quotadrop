@@ -552,6 +552,11 @@ nav {
 .fc-title { font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 4px; }
 .fc-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; line-height: 1.6; }
 
+<div class="form-group">
+  <label class="flabel">Your Name</label>
+  <input class="finput" type="text" id="fName" placeholder="e.g. Ahmad, Wei Liang">
+</div>
+
 .form-group { margin-bottom: 18px; }
 .flabel {
   display: block;
@@ -1551,14 +1556,23 @@ function updateOffer() {
 }
 updateOffer();
 
-function submitListing() {
+async function submitListing() {
   const email = document.getElementById('fEmail').value.trim();
   const area = document.getElementById('fArea').value.trim();
   const wa = document.getElementById('fWhatsapp').value.trim();
+  const name = document.getElementById('fName').value.trim();
   if (!email && !wa) { toast('Please enter your email or WhatsApp number ✉️'); return; }
   if (!area) { toast('Please add your area / location 📍'); return; }
-  toast('Listing posted! Takers will see it now 🎉');
-  // Reset
+  if (!name) { toast('Please enter your name 👤'); return; }
+  await postListing({
+    name, area, fuel: selectedFuel,
+    litres: +document.getElementById('litreSlider').value,
+    ask: +document.getElementById('askPrice').value,
+    email, wa, note: document.getElementById('fNote').value,
+    region: 'west'
+  });
+  toast('Listing posted! 🎉');
+  await fetchListings();
   setTimeout(() => gotoPanel('browse', null), 1200);
 }
 
