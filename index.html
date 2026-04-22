@@ -20,6 +20,9 @@
   --blue:     #3B82F6;
   --blue-lt:  #DBEAFE;
   --market:   #F97316;
+  --malaysia-red:  #CC0001;
+  --malaysia-blue: #003893;
+  --malaysia-gold: #FFCC00;
 
   /* LIGHT defaults */
   --bg:       #F5F7FA;
@@ -101,8 +104,8 @@ a { color: inherit; text-decoration: none; }
   border-right: 1px solid rgba(255,255,255,0.08);
   min-width: 80px;
 }
-.region-badge.west { color: #00A878; background: rgba(0,168,120,0.08); }
-.region-badge.east { color: #F59E0B; background: rgba(245,158,11,0.08); }
+.region-badge.west { color: var(--malaysia-blue); background: rgba(0,56,147,0.10); }
+.region-badge.east { color: var(--malaysia-red); background: rgba(204,0,1,0.08); }
 
 .ticker-scroll-area { overflow: hidden; flex: 1; position: relative; }
 .ticker-track {
@@ -171,7 +174,7 @@ nav {
   flex-shrink: 0;
   letter-spacing: -0.5px;
 }
-.logo em { color: var(--amber); font-style: normal; }
+.logo em { color: var(--malaysia-gold); font-style: normal; }
 
 .nav-tabs {
   display: flex;
@@ -531,7 +534,7 @@ nav {
 }
 .tp-verified { background: var(--green-lt); color: var(--green); }
 .tp-flexible { background: var(--amber-lt); color: var(--amber); }
-.tp-urgent   { background: var(--red-lt);   color: var(--red);   }
+.tp-urgent { background: rgba(204,0,1,0.08); color: var(--malaysia-red); }
 
 /* ═══════════════════════════════════════════
    OFFER PANEL
