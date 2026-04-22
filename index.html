@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuotaDrop — Malaysia Fuel Quota Marketplace</title>
+<meta name="description" content="Sell your unused BUDI95 fuel quota to Malaysians who need it. Zero fees, direct WhatsApp contact, pure P2P.">
+<meta name="keywords" content="fuel quota malaysia, BUDI95, RON95 quota, sell fuel quota, petrol subsidy malaysia">
+<meta property="og:title" content="QuotaDrop — Malaysia Fuel Quota Marketplace">
+<meta property="og:description" content="Your unused quota. Someone else's savings. Zero fees, zero middleman.">
+<meta property="og:image" content="https://quotadrop.vercel.app/og-image.png">
+<meta property="og:url" content="https://quotadrop.vercel.app">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="QuotaDrop — Malaysia Fuel Quota Marketplace">
+<meta name="twitter:description" content="Your unused quota. Someone else's savings.">
+<meta name="twitter:image" content="https://quotadrop.vercel.app/og-image.png">
 <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@600;700&family=Unbounded:wght@700;900&family=Cabinet+Grotesk:wght@400;500;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Familjen+Grotesk:wght@700;800&display=swap" rel="stylesheet">
 <style>
@@ -1051,13 +1062,15 @@ nav {
       </div>
     </div>
     <div class="quota-card">
-      <div class="qc-label">Your April Quota</div>
-      <div class="qc-main">120L</div>
-      <div class="qc-sub">remaining of 200L this month</div>
-      <div class="qc-bar-wrap">
-        <div class="qc-bar"><div class="qc-bar-fill"></div></div>
-        <div class="qc-bar-label"><span>80L used</span><span>120L left</span></div>
+      <div class="qc-label">⏳ Quota Reminder</div>
+      <div class="qc-main" id="days-left" style="font-size:48px;">–</div>
+      <div class="qc-sub">days until your quota expires</div>
+      <div class="qc-earn" style="margin-top:16px;font-size:14px;line-height:1.6;">
+        Your quota is just sitting there.<br>
+        <strong style="color:var(--text);">Like your gym membership.</strong>
       </div>
+      <a href="https://www.mysubsidi.gov.my" target="_blank" style="display:block;margin-top:14px;text-align:center;background:var(--green);color:#fff;font-weight:700;font-size:12px;padding:9px;border-radius:8px;">Check MySubsidi →</a>
+    </div>
       <div class="qc-earn">
         List all 120L at RM2.80 → earn approx <strong>RM97</strong> extra this month
       </div>
@@ -1581,5 +1594,10 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 </script>
+// Days left in month
+const now = new Date();
+const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+const daysLeft = lastDay - now.getDate();
+document.getElementById('days-left').textContent = daysLeft;
 </body>
 </html>
