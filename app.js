@@ -8,6 +8,13 @@ async function fetchListings() {
   })
   LISTINGS = await res.json()
   renderListings(LISTINGS)
+
+  // update stats
+  const totalLitres = LISTINGS.reduce((s, l) => s + (l.litres || 0), 0)
+  const avgSaving = LISTINGS.length ? (LISTINGS.reduce((s, l) => s + (4.02 - l.ask), 0) / LISTINGS.length) : 0
+  document.getElementById('stat-listings').textContent = LISTINGS.length
+  document.getElementById('stat-litres').textContent = totalLitres + 'L'
+  document.getElementById('stat-saving').textContent = 'RM' + avgSaving.toFixed(2)
 }
 
 async function postListing(body) {

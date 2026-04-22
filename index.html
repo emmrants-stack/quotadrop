@@ -1068,10 +1068,10 @@ nav {
   <!-- ══ BROWSE PANEL ══ -->
   <div id="panel-browse" class="panel active">
     <div class="stats-row">
-      <div class="scard"><div class="scard-num">247</div><div class="scard-label">Active Listings</div></div>
-      <div class="scard"><div class="scard-num">12,840L</div><div class="scard-label">Quota Available</div></div>
-      <div class="scard"><div class="scard-num">RM2.03</div><div class="scard-label">Avg Saving/Litre</div></div>
-      <div class="scard"><div class="scard-num">100%</div><div class="scard-label">No Platform Fee</div></div>
+    <div class="scard"><div class="scard-num" id="stat-listings">0</div><div class="scard-label">Active Listings</div></div>
+    <div class="scard"><div class="scard-num" id="stat-litres">0L</div><div class="scard-label">Quota Available</div></div>
+    <div class="scard"><div class="scard-num" id="stat-saving">RM0</div><div class="scard-label">Avg Saving/Litre</div></div>
+    <div class="scard"><div class="scard-num">100%</div><div class="scard-label">No Platform Fee</div></div>
     </div>
 
     <div class="browse-toolbar">
@@ -1101,7 +1101,7 @@ nav {
           <label class="flabel">Your Name</label>
           <input class="finput" type="text" id="fName" placeholder="e.g. Ahmad, Wei Liang">
         </div>        
-        
+
         <div class="form-group">
           <label class="flabel">Fuel Type</label>
           <div class="fuel-type-selector">
@@ -1423,7 +1423,7 @@ function renderListings(data) {
           <div class="avatar" style="background:${l.ac};">${l.avatar}</div>
           <div>
             <div class="lcard-name">${l.name}</div>
-            <div class="lcard-loc">📍 ${l.loc}</div>
+            <div class="lcard-loc">📍 ${l.area}</div>
           </div>
         </div>
         <span class="fuel-pill ${fuelPillClass(l.fuel)}">${fuelIcon(l.fuel)} ${fuelLabel(l.fuel)}</span>
