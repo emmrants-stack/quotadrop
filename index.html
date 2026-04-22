@@ -1479,7 +1479,7 @@ function filterListings(f, btn) {
   else if (f === '50+') filtered = LISTINGS.filter(l => l.litres >= 50);
   renderListings(filtered);
 }
-renderListings(LISTINGS);
+fetchListings();
 
 function copyEmail(email) {
   navigator.clipboard.writeText(email).then(() => toast('Email copied! ' + email));
