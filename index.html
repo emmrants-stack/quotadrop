@@ -1326,18 +1326,6 @@ const PRICES = {
   east: { r95sub: 1.99, r95mkt: 4.02, r97: 5.10, diesel: 2.15 }
 };
 
-const LISTINGS = [
-  { id:1, name:"Razif M.", loc:"Cheras, KL", region:"west", avatar:"R", ac:"#0D6B4B", fuel:"r95", litres:80, ask:2.60, tag:"verified", email:"razif.m@gmail.com", wa:"60123456789", note:"Happy to meet at Petronas Cheras Baru. Prefer morning or after 7pm. WhatsApp me first." },
-  { id:2, name:"Siti A.", loc:"Petaling Jaya", region:"west", avatar:"S", ac:"#5B21B6", fuel:"r95", litres:50, ask:2.50, tag:"flexible", email:"sitianis@gmail.com", wa:"60198765432", note:"Mornings only. Shell preferred. Negotiable on price for bulk requests." },
-  { id:3, name:"Kumar N.", loc:"Subang Jaya", region:"west", avatar:"K", ac:"#1D4ED8", fuel:"r95", litres:120, ask:2.80, tag:"verified", email:"nkumar88@outlook.com", wa:"60111234567", note:"Big surplus this month. Can split into 2 sessions if needed." },
-  { id:4, name:"Farah Z.", loc:"Ampang, KL", region:"west", avatar:"F", ac:"#9D174D", fuel:"r97", litres:30, ask:3.80, tag:"urgent", email:"farahz92@yahoo.com", wa:"60169876543", note:"Quota expires this Friday — priced below market to move fast. RON97 specialist." },
-  { id:5, name:"Wei Liang", loc:"Kepong, KL", region:"west", avatar:"W", ac:"#065F46", fuel:"r95", litres:65, ask:2.70, tag:"verified", email:"weiliangkl@gmail.com", wa:"60127654321", note:"Regular lister. 100% meet rate. Petronas or BHP preferred." },
-  { id:6, name:"Amirul H.", loc:"Shah Alam", region:"west", avatar:"A", ac:"#92400E", fuel:"r95", litres:150, ask:2.55, tag:"flexible", email:"amirul.hisham@gmail.com", wa:"60133456789", note:"E-hailing driver with 800L quota. Open to long-term monthly arrangement." },
-  { id:7, name:"Dayang R.", loc:"Kuching, Sarawak", region:"east", avatar:"D", ac:"#0369A1", fuel:"dsl", litres:100, ask:3.50, tag:"verified", email:"dayangr.kuching@gmail.com", wa:"60198812345", note:"Diesel at RM2.15 subsidised here in Sarawak. You save massively vs W.MY rates." },
-  { id:8, name:"Jeffri K.", loc:"Kota Kinabalu, Sabah", region:"east", avatar:"J", ac:"#7C3AED", fuel:"dsl", litres:80, ask:3.20, tag:"flexible", email:"jeffrik.kk@gmail.com", wa:"60168823456", note:"Sabah subsidised diesel. Great deal for anyone needing diesel at below-Peninsular rates." },
-  { id:9, name:"Mei Lin", loc:"Penang", region:"west", avatar:"M", ac:"#BE185D", fuel:"r97", litres:45, ask:4.20, tag:"flexible", email:"meilin.pg@gmail.com", wa:"60124567890", note:"RON97 surplus. Prefer Shell Georgetown. Can arrange evenings." },
-];
-
 /* ═══════════════ TICKER BUILD ═══════════════ */
 function buildTickerItems(region) {
   const p = PRICES[region];
