@@ -1,4 +1,4 @@
-const SUPA_URL = 'https://bmphogbzsvpyvtqjxrvz.supabase.co/rest/v1/'
+const SUPA_URL = 'https://bmphogbzsvpyvtqjxrvz.supabase.co'
 
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtcGhvZ2J6c3ZweXZ0cWp4cnZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NDMzNDYsImV4cCI6MjA5MjQxOTM0Nn0.8NIs5zEaqqE8bWiUnsTvPlLU-pKbzxiN4YLbx6oAJVE'
 
