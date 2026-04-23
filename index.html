@@ -892,7 +892,7 @@ nav {
   nav { padding: 0 14px; height: 54px; gap: 8px; }
   .nav-tabs { display: none; }
   .logo { font-size: 15px; letter-spacing: -0.3px; }
-  .btn-post span { display: none; }
+  .btn-post span { display: inline; }
   .btn-post { padding: 8px 12px; font-size: 12px; border-radius: 8px; }
   .theme-btn { width: 32px; height: 32px; font-size: 14px; }
 
@@ -921,11 +921,13 @@ nav {
   body { padding-bottom: 72px; }
 
   .hero-inner { grid-template-columns: 1fr; gap: 20px; }
-  .quota-card { display: none; }
+  .quota-card { display: block; }
   .hero { padding: 18px 14px; }
   .main { padding: 16px 14px 40px; }
   .hero-title { font-size: 24px; letter-spacing: -1px; }
-  .price-pills { gap: 6px; }
+  .price-pills { gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .price-pills::-webkit-scrollbar { display: none; }
+  .ppill { flex-shrink: 0; }
   .ppill { padding: 8px 10px; }
   .ppill-price { font-size: 13px; }
   .ppill-label { font-size: 9px; }
