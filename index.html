@@ -1595,11 +1595,3 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// Days left in month
-const now = new Date();
-const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-const daysLeft = lastDay - now.getDate();
-document.getElementById('days-left').textContent = daysLeft;
-</script>
-</body>
-</html>

@@ -28,5 +28,13 @@ async function postListing(body) {
     body: JSON.stringify(body)
 
   })
-
 }
+
+  // Days left in month
+document.addEventListener('DOMContentLoaded', function() {
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const daysLeft = lastDay - now.getDate();
+  const el = document.getElementById('days-left');
+  if (el) el.textContent = daysLeft;
+});
