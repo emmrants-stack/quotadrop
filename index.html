@@ -565,11 +565,6 @@ nav {
 .fc-title { font-family: 'Familjen Grotesk', 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 4px; }
 .fc-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; line-height: 1.6; }
 
-<div class="form-group">
-  <label class="flabel">Your Name</label>
-  <input class="finput" type="text" id="fName" placeholder="e.g. Ahmad, Wei Liang">
-</div>
-
 .form-group { margin-bottom: 18px; }
 .flabel {
   display: block;
@@ -970,6 +965,10 @@ nav {
 
   /* Toast mobile */
   .toast { bottom: 80px; right: 12px; left: 12px; max-width: none; text-align: center; }
+
+  /* Offer modal as bottom sheet on mobile */
+  #offer-modal { align-items: flex-end; padding: 0; }
+  #offer-modal .modal { border-radius: 20px 20px 0 0; max-height: 88vh; overflow-y: auto; max-width: 100%; }
 }
 @media (max-width: 380px) {
   .logo { font-size: 13px; }
@@ -981,7 +980,6 @@ nav {
   .mobile-nav { display: none; }
 }
 </style>
-<script src="app.js"></script>
 </head>
 <body>
 
@@ -1015,7 +1013,7 @@ nav {
   </div>
   <div class="nav-right">
     <button class="theme-btn" onclick="toggleTheme()" id="theme-icon" title="Toggle theme">🌙</button>
-    <button class="btn-post" onclick="gotoPanel('offer',null)">
+    <button class="btn-post" onclick="openOfferModal()">
       <span>+ List Quota</span>
     </button>
   </div>
@@ -1109,99 +1107,11 @@ nav {
 
   <!-- ══ OFFER PANEL ══ -->
   <div id="panel-offer" class="panel">
-    <div class="offer-grid">
-      <div class="form-card">
-        <div class="fc-title">List Your Surplus Quota</div>
-        <div class="fc-sub">No account needed. Add your email so interested takers can reach you directly. Zero fees, zero middleman — you negotiate and meet at the pump.</div>
-
-        <div class="form-group">
-          <label class="flabel">Your Name</label>
-          <input class="finput" type="text" id="fName" placeholder="e.g. Ahmad, Wei Liang">
-        </div>        
-
-        <div class="form-group">
-          <label class="flabel">Fuel Type</label>
-          <div class="fuel-type-selector">
-            <button class="ftype-opt active r95" onclick="selectFuel('r95',this)">
-              <span class="ft-icon">⛽</span>RON 95
-            </button>
-            <button class="ftype-opt r97" onclick="selectFuel('r97',this)">
-              <span class="ft-icon">🔶</span>RON 97
-            </button>
-            <button class="ftype-opt dsl" onclick="selectFuel('dsl',this)">
-              <span class="ft-icon">🚛</span>Diesel
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="flabel">Litres to Offer — <span id="litre-disp" style="color:var(--green);font-family:'JetBrains Mono'">60 L</span></label>
-          <div class="slider-row">
-            <input type="range" class="range-slider" min="10" max="200" value="60" id="litreSlider" oninput="updateOffer()">
-            <div class="slider-val" id="s-litres">60 L</div>
-          </div>
-        </div>
-
-        <div class="frow">
-          <div class="form-group">
-            <label class="flabel">Your Asking Price (RM/L)</label>
-            <input class="finput" type="number" id="askPrice" value="2.80" step="0.10" min="2.00" max="5.80" oninput="updateOffer()">
-          </div>
-          <div class="form-group">
-            <label class="flabel">Area / Neighbourhood</label>
-            <input class="finput" type="text" id="fArea" placeholder="e.g. Cheras, KL">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="flabel">Your Contact Email (shown on listing)</label>
-          <input class="finput" type="email" id="fEmail" placeholder="yourname@gmail.com">
-        </div>
-
-        <div class="form-group">
-          <label class="flabel">WhatsApp Number <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(recommended for faster replies)</span></label>
-          <input class="finput" type="tel" id="fWhatsapp" placeholder="e.g. 60123456789 (with country code)">
-        </div>
-
-        <div class="form-group">
-          <label class="flabel">Preferred Station (optional)</label>
-          <select class="finput" id="fStation">
-            <option value="">Any station</option>
-            <option>Petronas</option>
-            <option>Shell</option>
-            <option>BHP</option>
-            <option>Petron</option>
-            <option>Caltex</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="flabel">Notes for Taker</label>
-          <textarea class="finput" rows="3" id="fNote" placeholder="e.g. Available mornings only. WhatsApp me to confirm time and location."></textarea>
-        </div>
-
-        <button class="submit-btn" onclick="submitListing()">Post Listing — Free &amp; Instant</button>
-        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">
-          No account required. Listing expires at month end. Takers contact you via WhatsApp or email.
-        </p>
-      </div>
-
-      <!-- Preview -->
-      <div class="preview-card">
-        <h3>Listing Preview</h3>
-        <div class="pc-sub">This is how your listing appears to takers</div>
-        <div class="preview-listing">
-          <div class="pl-row"><span class="pl-key">Fuel</span><span class="pl-val" id="prev-fuel">RON 95 (BUDI95)</span></div>
-          <div class="pl-row"><span class="pl-key">Quantity</span><span class="pl-val green" id="prev-qty">60 L</span></div>
-          <div class="pl-row"><span class="pl-key">Your price</span><span class="pl-val green" id="prev-price">RM2.80 / L</span></div>
-          <div class="pl-row"><span class="pl-key">Taker saves vs market</span><span class="pl-val amber" id="prev-save">RM73.20 total</span></div>
-          <div class="pl-row"><span class="pl-key">Platform fee</span><span class="pl-val green">RM0.00 — none</span></div>
-          <div class="pl-row"><span class="pl-key">You keep</span><span class="pl-val green" id="prev-earn">RM168 total</span></div>
-        </div>
-        <div class="p2p-note">
-          <strong>100% P2P.</strong> QuotaDrop earns nothing. You and the taker agree on price, station, and payment method directly. We just connect you.
-        </div>
-      </div>
+    <div style="text-align:center;padding:60px 20px 40px;">
+      <div style="font-size:56px;margin-bottom:16px;">⛽</div>
+      <div style="font-family:'Familjen Grotesk',sans-serif;font-size:24px;font-weight:800;margin-bottom:10px;">List Your Surplus Quota</div>
+      <p style="color:var(--text2);margin-bottom:28px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6;">Free &amp; instant. No account needed. Takers contact you directly via WhatsApp or email.</p>
+      <button class="submit-btn" style="max-width:280px;margin:0 auto;display:block;" onclick="openOfferModal()">+ Post a Listing Now</button>
     </div>
   </div>
 
@@ -1310,12 +1220,71 @@ nav {
   <button class="mnav-item active" id="mn-browse" onclick="gotoPanel('browse',null);setMobileTab('mn-browse')">
     <span class="mi">🔍</span>Browse
   </button>
-  <button class="mnav-item" id="mn-offer" onclick="gotoPanel('offer',null);setMobileTab('mn-offer')">
+  <button class="mnav-item" id="mn-offer" onclick="openOfferModal();setMobileTab('mn-offer')">
     <span class="mi">✏️</span>List Quota
   </button>
   <button class="mnav-item" id="mn-how" onclick="gotoPanel('how',null);setMobileTab('mn-how')">
     <span class="mi">💡</span>How It Works
   </button>
+</div>
+
+<!-- Offer Form Modal -->
+<div class="modal-overlay" id="offer-modal" onclick="closeOfferOutside(event)">
+  <div class="modal" style="max-width:500px;max-height:88vh;overflow-y:auto;">
+    <button class="modal-close" onclick="closeOfferModal()">×</button>
+    <div class="modal-title">List Your Surplus Quota</div>
+    <div class="modal-sub">No account needed. Zero fees. Takers contact you directly.</div>
+    <div class="form-group">
+      <label class="flabel">Your Name</label>
+      <input class="finput" type="text" id="fName" placeholder="e.g. Ahmad, Wei Liang">
+    </div>
+    <div class="form-group">
+      <label class="flabel">Fuel Type</label>
+      <div class="fuel-type-selector">
+        <button class="ftype-opt active r95" onclick="selectFuel('r95',this)"><span class="ft-icon">⛽</span>RON 95</button>
+        <button class="ftype-opt r97" onclick="selectFuel('r97',this)"><span class="ft-icon">🔶</span>RON 97</button>
+        <button class="ftype-opt dsl" onclick="selectFuel('dsl',this)"><span class="ft-icon">🚛</span>Diesel</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="flabel">Litres to Offer — <span id="litre-disp" style="color:var(--green);font-family:'JetBrains Mono'">60 L</span></label>
+      <div class="slider-row">
+        <input type="range" class="range-slider" min="10" max="200" value="60" id="litreSlider" oninput="updateOffer()">
+        <div class="slider-val" id="s-litres">60 L</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="form-group">
+        <label class="flabel">Asking Price (RM/L)</label>
+        <input class="finput" type="number" id="askPrice" value="2.80" step="0.10" min="2.00" max="5.80" oninput="updateOffer()">
+      </div>
+      <div class="form-group">
+        <label class="flabel">Area / Neighbourhood</label>
+        <input class="finput" type="text" id="fArea" placeholder="e.g. Cheras, KL">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="flabel">Contact Email</label>
+      <input class="finput" type="email" id="fEmail" placeholder="yourname@gmail.com">
+    </div>
+    <div class="form-group">
+      <label class="flabel">WhatsApp Number <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(recommended)</span></label>
+      <input class="finput" type="tel" id="fWhatsapp" placeholder="e.g. 60123456789">
+    </div>
+    <div class="form-group">
+      <label class="flabel">Preferred Station (optional)</label>
+      <select class="finput" id="fStation">
+        <option value="">Any station</option>
+        <option>Petronas</option><option>Shell</option><option>BHP</option><option>Petron</option><option>Caltex</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="flabel">Notes for Taker</label>
+      <textarea class="finput" rows="3" id="fNote" placeholder="e.g. Available mornings only. WhatsApp me first."></textarea>
+    </div>
+    <button class="submit-btn" onclick="submitListing()">Post Listing — Free &amp; Instant</button>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">No account required. Listing expires at month end.</p>
+  </div>
 </div>
 
 <!-- Modal (contact) -->
@@ -1531,6 +1500,10 @@ function openContact(id) {
   }
   document.getElementById('modal').classList.add('open');
 }
+function openOfferModal() { document.getElementById('offer-modal').classList.add('open'); }
+function closeOfferModal() { document.getElementById('offer-modal').classList.remove('open'); }
+function closeOfferOutside(e) { if (e.target.id === 'offer-modal') closeOfferModal(); }
+
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 function closeModalOutside(e) { if (e.target.id === 'modal') closeModal(); }
 
@@ -1551,21 +1524,9 @@ function selectFuel(f, btn) {
 function updateOffer() {
   const litres = +document.getElementById('litreSlider').value;
   const ask = +document.getElementById('askPrice').value || 2.80;
-  const mkt = fuelMkt[selectedFuel];
-  const subsidy = selectedFuel === 'r95' ? PRICES.west.r95sub : (selectedFuel === 'r97' ? PRICES.west.r97 : PRICES.west.diesel);
-  const takerSave = ((mkt - ask) * litres).toFixed(2);
-  const youEarn = (ask * litres).toFixed(2);
-
   document.getElementById('s-litres').textContent = litres + ' L';
   document.getElementById('litre-disp').textContent = litres + ' L';
-
-  document.getElementById('prev-fuel').textContent = fuelNames[selectedFuel];
-  document.getElementById('prev-qty').textContent = litres + ' L';
-  document.getElementById('prev-price').textContent = `RM${ask.toFixed(2)} / L`;
-  document.getElementById('prev-save').textContent = takerSave > 0 ? `RM${takerSave} total` : '–';
-  document.getElementById('prev-earn').textContent = `RM${youEarn} total`;
 }
-updateOffer();
 
 async function submitListing() {
   const email = document.getElementById('fEmail').value.trim();
@@ -1584,7 +1545,8 @@ async function submitListing() {
   });
   toast('Listing posted! 🎉');
   await fetchListings();
-  setTimeout(() => gotoPanel('browse', null), 1200);
+  closeOfferModal();
+  gotoPanel('browse', null);
 }
 
 /* ═══════════════ TOAST ═══════════════ */
@@ -1595,3 +1557,7 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+</script>
+<script src="app.js"></script>
+</body>
+</html>
